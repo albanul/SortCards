@@ -43,7 +43,7 @@ namespace Cards.Tests
 
 			var result = Program.SortCards(input);
 
-			CollectionAssert.AreEqual(input, result, "two cards unshuffled test fails");
+			CollectionAssert.AreEqual(input, result, "two unshuffled cards test fails");
 		}
 
 		[TestMethod]
@@ -61,7 +61,7 @@ namespace Cards.Tests
 				new Card("Cologne", "Moscow")
 			};
 
-			CollectionAssert.AreEqual(correctResult, result, Card.CardsComparer);
+			CollectionAssert.AreEqual(correctResult, result, Card.CardsComparer, "two shuffled cards test fails");
 		}
 
 		[TestMethod]
@@ -81,7 +81,7 @@ namespace Cards.Tests
 				new Card("Moscow", "Paris")
 			};
 
-			CollectionAssert.AreEqual(correctResult, result, Card.CardsComparer);
+			CollectionAssert.AreEqual(correctResult, result, Card.CardsComparer, "simple test fails");
 		}
 
 		[TestMethod]

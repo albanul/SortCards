@@ -10,7 +10,7 @@ namespace Cards
 
 		public string Arrival { get; }
 
-		public Card(string departure = "", string arrival = "")
+		public Card(string departure, string arrival)
 		{
 			Departure = departure;
 			Arrival = arrival;

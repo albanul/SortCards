@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Cards
 {
@@ -24,6 +23,7 @@ namespace Cards
 					Node arrivalNodeLeft = null;
 					Node departureNodeRight = null;
 
+					// trying to find left card to join
 					if (arrivalDict.ContainsKey(card.Departure))
 					{
 						arrivalNodeLeft = arrivalDict[card.Departure];
@@ -38,6 +38,7 @@ namespace Cards
 						}
 					}
 
+					// trying to find right card to join
 					if (departureDict.ContainsKey(card.Arrival))
 					{
 						departureNodeRight = departureDict[card.Arrival];
@@ -52,9 +53,14 @@ namespace Cards
 						}
 					}
 
+					// add nodes to the hash tables
 					departureDict.Add(card.Departure, departureNode);
 					arrivalDict.Add(card.Arrival, arrivalNode);
 
+
+					// section where we handle the first card in result list
+
+					// if we have successfully joined to left card
 					if (arrivalNodeLeft != null)
 					{
 						var leftmostCard = arrivalNodeLeft.Leftmost;
@@ -62,6 +68,8 @@ namespace Cards
 						var leftmostArrivalNode = arrivalDict[leftmostCard.Arrival];
 						var leftmostDepartureNode = departureDict[leftmostCard.Departure];
 
+						// set correct pointers to the leftmost and the rightmost cards
+						// in the current connected component
 						leftmostArrivalNode.Rightmost = card;
 						leftmostDepartureNode.Rightmost = card;
 
@@ -69,6 +77,7 @@ namespace Cards
 						departureNode.Leftmost = leftmostDepartureNode.Next;
 					}
 
+					// if we have successfully joined to right card
 					if (departureNodeRight != null)
 					{
 						var rightmostCard = departureNodeRight.Rightmost;
@@ -80,11 +89,14 @@ namespace Cards
 						var leftmostArrivalNode = arrivalDict[leftmostCard.Arrival];
 						var leftmostDepartureNode = departureDict[leftmostCard.Departure];
 
+						// change first card pointer if necessary
 						if (rightmostCard == firstCard)
 						{
 							firstCard = leftmostCard;
 						}
 
+						// set correct pointers to the leftmost and the rightmost cards
+						// in the current connected component
 						rightmostArrivalNode.Leftmost = leftmostCard;
 						rightmostDepartureNode.Leftmost = leftmostCard;
 
@@ -93,17 +105,19 @@ namespace Cards
 					}
 				}
 
+				// generate unshuffled list
 				unshuffledCards.Add(firstCard);
-
 				var node = arrivalDict[firstCard.Arrival];
 
 				while (node.Next != null)
 				{
 					unshuffledCards.Add(node.Next);
 					node = arrivalDict[node.Next.Arrival];
+
+					// throw an exception if we have stucked in a loop
 					if (node.Next == firstCard)
 					{
-						throw new LoopException("We are in loop. The departure point and the arrival point are the same!");
+						throw new LoopException("We are in a loop. The departure point and the arrival point are the same!");
 					}
 						
 				}

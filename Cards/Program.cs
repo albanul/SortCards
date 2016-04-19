@@ -101,6 +101,11 @@ namespace Cards
 				{
 					unshuffledCards.Add(node.Next);
 					node = arrivalDict[node.Next.Arrival];
+					if (node.Next == firstCard)
+					{
+						throw new LoopException("We are in loop. The departure point and the arrival point are the same!");
+					}
+						
 				}
 			}
 
@@ -109,19 +114,7 @@ namespace Cards
 
 		private static void Main()
 		{
-			var shuffledCards = new List<Card>
-			{
-				new Card("Melbourne", "Cologne"),
-				new Card("Moscow", "Paris"),
-				new Card("Cologne", "Moscow")
-			};
-
-			var sortedCards = SortCards(shuffledCards);
-
-			foreach (var card in sortedCards)
-			{
-				Console.WriteLine($"{card.Departure} -> {card.Arrival}");
-			}
+			
 		}
 	}
 }

@@ -24,9 +24,6 @@ namespace Cards
 					Node arrivalNodeLeft = null;
 					Node departureNodeRight = null;
 
-					departureDict.Add(card.Departure, departureNode);
-					arrivalDict.Add(card.Arrival, arrivalNode);
-
 					if (arrivalDict.ContainsKey(card.Departure))
 					{
 						arrivalNodeLeft = arrivalDict[card.Departure];
@@ -54,6 +51,9 @@ namespace Cards
 							throw new LoopException("There is a loop in the card list!");
 						}
 					}
+
+					departureDict.Add(card.Departure, departureNode);
+					arrivalDict.Add(card.Arrival, arrivalNode);
 
 					if (arrivalNodeLeft != null)
 					{

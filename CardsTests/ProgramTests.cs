@@ -85,8 +85,39 @@ namespace Cards.Tests
 		}
 
 		[TestMethod]
+		public void WorstCaseScenarioTest()
+		{
+			var input = new List<Card>();
+			var subList = new List<Card>();
+			var correctResult = new List<Card>();
+
+			var i = 0;
+			while (i < 1000000)
+			{
+				var card1 = new Card(i.ToString(), (i+1).ToString());
+				var card2 = new Card((i+1).ToString(), (i+2).ToString());
+
+				input.Add(card1);
+				subList.Add(card2);
+
+				correctResult.Add(card1);
+				correctResult.Add(card2);
+
+				i += 2;
+			}
+
+			subList.Reverse();
+
+			input.AddRange(subList);
+
+			var result = Program.SortCards(input);
+
+			CollectionAssert.AreEqual(result, correctResult, "Worst case scenario test fails");
+		}
+
+		[TestMethod]
 		[ExpectedException(typeof(LoopException))]
-		public void LoopTest()
+		public void FullLoopTest()
 		{
 			Program.SortCards(new List<Card>
 			{
@@ -94,6 +125,22 @@ namespace Cards.Tests
 				new Card("Moscow", "Paris"),
 				new Card("Cologne", "Moscow"),
 				new Card("Paris", "Melbourne")
+			});
+		}
+
+		[TestMethod]
+		[ExpectedException(typeof(LoopException))]
+		public void LocalLoopTest()
+		{
+			Program.SortCards(new List<Card>
+			{
+				new Card("1", "2"),
+				new Card("2", "3"),
+				new Card("4", "5"),
+				new Card("5", "6"),
+				new Card("6", "2"),
+				new Card("6", "7"),
+				new Card("7", "8")
 			});
 		}
 	}

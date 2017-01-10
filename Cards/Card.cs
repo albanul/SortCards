@@ -1,11 +1,9 @@
-﻿using System.Collections;
+﻿using System;
 
 namespace Cards
 {
-	public class Card
+	public class Card : IEquatable<Card>
 	{
-		public static IComparer CardsComparer => new CardComparer() as IComparer;
-
 		public string Departure { get; }
 
 		public string Arrival { get; }
@@ -14,6 +12,29 @@ namespace Cards
 		{
 			Departure = departure;
 			Arrival = arrival;
+		}
+
+		public bool Equals(Card other)
+		{
+			if (ReferenceEquals(null, other)) return false;
+			if (ReferenceEquals(this, other)) return true;
+			return string.Equals(Departure, other.Departure) && string.Equals(Arrival, other.Arrival);
+		}
+
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(null, obj)) return false;
+			if (ReferenceEquals(this, obj)) return true;
+
+			return obj.GetType() == GetType() && Equals((Card) obj);
+		}
+
+		public override int GetHashCode()
+		{
+			unchecked
+			{
+				return ((Departure?.GetHashCode() ?? 0) * 397) ^ (Arrival?.GetHashCode() ?? 0);
+			}
 		}
 	}
 }

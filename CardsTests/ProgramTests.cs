@@ -1,39 +1,43 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Xunit;
 
 namespace Cards.Tests
 {
-	[TestClass]
 	public class ProgramTests
 	{
-		[TestMethod]
-		public void NullInputCardsTest()
+		[Fact]
+		public void SortCards_NullList_EmptyListReturned()
 		{
-			var result = Program.SortCards(null);
+			var result = new List<Card>();
 
-			CollectionAssert.AreEqual(new List<Card>(), result, "null input test fails");
+			var cards = Program.SortCards(null);
+
+			Assert.Equal(result, cards);
 		}
 
-		[TestMethod]
-		public void EmptyInputCardsTests()
+		[Fact]
+		public void SortCards_EmptyList_EmptyListReturned()
 		{
-			var result = Program.SortCards(new List<Card>());
+			var input = new List<Card>();
+			var result = new List<Card>();
 
-			CollectionAssert.AreEqual(new List<Card>(), result, "empty input test fails");
+			var cards = Program.SortCards(input);
+
+			Assert.Equal(result, cards);
 		}
 
-		[TestMethod]
-		public void SingleCardTest()
+		[Fact]
+		public void SortCards_ListWithOneCard_SameListReturned()
 		{
 			var input = new List<Card> {new Card("Melbourne", "Cologne")};
 
-			var result = Program.SortCards(input);
+			var cards = Program.SortCards(input);
 
-			CollectionAssert.AreEqual(input, result, "single card input test fails");
+			Assert.Equal(input, cards);
 		}
 
-		[TestMethod]
-		public void TwoUnshuffledCardsTest()
+		[Fact]
+		public void SortCards_ListWihTwoUnshuffeldCards_SameListReturned()
 		{
 			var input = new List<Card>
 			{
@@ -41,98 +45,101 @@ namespace Cards.Tests
 				new Card("Cologne", "Moscow")
 			};
 
-			var result = Program.SortCards(input);
+			var cards = Program.SortCards(input);
 
-			CollectionAssert.AreEqual(input, result, "two unshuffled cards test fails");
+			Assert.Equal(input, cards);
 		}
 
-		[TestMethod]
-		public void TwoShuffledCardsTest()
+		[Fact]
+		public void SortCards_ListWithCMAndMC_ListWithMCAndCMReturned()
 		{
-			var result = Program.SortCards(new List<Card>
+			var input = new List<Card>
 			{
 				new Card("Cologne", "Moscow"),
 				new Card("Melbourne", "Cologne")
-			});
-
-			var correctResult = new List<Card>
+			};
+			var result = new List<Card>
 			{
 				new Card("Melbourne", "Cologne"),
 				new Card("Cologne", "Moscow")
 			};
 
-			CollectionAssert.AreEqual(correctResult, result, Card.CardsComparer, "two shuffled cards test fails");
+			var cards = Program.SortCards(input);
+
+			Assert.Equal(result, cards);
 		}
 
-		[TestMethod]
-		public void SimpleTest()
+		[Fact]
+		public void SortCards_ListWithThreeShuffeldCards_UnshuffeldListReturned()
 		{
-			var result = Program.SortCards(new List<Card>
+			var input = new List<Card>
 			{
 				new Card("Melbourne", "Cologne"),
 				new Card("Moscow", "Paris"),
 				new Card("Cologne", "Moscow")
-			});
-
-			var correctResult = new List<Card>
+			};
+			var result = new List<Card>
 			{
 				new Card("Melbourne", "Cologne"),
 				new Card("Cologne", "Moscow"),
 				new Card("Moscow", "Paris")
 			};
 
-			CollectionAssert.AreEqual(correctResult, result, Card.CardsComparer, "simple test fails");
+			var cards = Program.SortCards(input);
+
+			Assert.Equal(result, cards);
 		}
 
-		[TestMethod]
-		public void WorstCaseScenarioTest()
+		[Fact]
+		public void SortCards_WorstCaseScenario()
 		{
+			const int count = 100000;
 			var input = new List<Card>();
 			var subList = new List<Card>();
-			var correctResult = new List<Card>();
+			var result = new List<Card>();
 
-			var i = 0;
-			while (i < 1000000)
+			for (var i = 0; i < count; i+=2)
 			{
-				var card1 = new Card(i.ToString(), (i+1).ToString());
-				var card2 = new Card((i+1).ToString(), (i+2).ToString());
+				var first = i.ToString();
+				var second = (i+1).ToString();
+				var third = (i+2).ToString();
+
+				var card1 = new Card(first, second);
+				var card2 = new Card(second, third);
 
 				input.Add(card1);
-				subList.Add(card2);
+				subList.Insert(0, card2);
 
-				correctResult.Add(card1);
-				correctResult.Add(card2);
-
-				i += 2;
+				result.Add(card1);
+				result.Add(card2);
 			}
-
-			subList.Reverse();
 
 			input.AddRange(subList);
 
-			var result = Program.SortCards(input);
+			var cards = Program.SortCards(input);
 
-			CollectionAssert.AreEqual(result, correctResult, "Worst case scenario test fails");
+			Assert.Equal(result, cards);
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(LoopException))]
-		public void FullLoopTest()
+		[Fact]
+		public void SortCards_ListWithLoopCards_ThrowsLoopException()
 		{
-			Program.SortCards(new List<Card>
+			var input = new List<Card>
 			{
 				new Card("Melbourne", "Cologne"),
 				new Card("Moscow", "Paris"),
 				new Card("Cologne", "Moscow"),
 				new Card("Paris", "Melbourne")
-			});
+			};
+
+			Assert.Throws<LoopException>(() => Program.SortCards(input));
 		}
 
-		[TestMethod]
-		[ExpectedException(typeof(LoopException))]
-		public void LocalLoopTest()
+		
+		[Fact]
+		public void SortCards_ListWithLoopNumericCards_ThrowsLoopException()
 		{
-			Program.SortCards(new List<Card>
+			var input = new List<Card>
 			{
 				new Card("1", "2"),
 				new Card("2", "3"),
@@ -141,7 +148,9 @@ namespace Cards.Tests
 				new Card("6", "2"),
 				new Card("6", "7"),
 				new Card("7", "8")
-			});
+			};
+
+			Assert.Throws<LoopException>(() => Program.SortCards(input));
 		}
 	}
 }

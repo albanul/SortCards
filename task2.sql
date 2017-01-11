@@ -1,6 +1,8 @@
-﻿--	Если заказ харектеризуется общим [salesid], а порядок элементов характеризуется полем [datetime]
+﻿Sales: Id, ProductId, CustomerId, DateCreated
+
+--	Если заказ харектеризуется общим [Id], а порядок элементов характеризуется полем [DateCreated]
 -- 	как в примере:
---	salesid		productid		datetime 					customerid
+--	Id			ProductId		DateCreated 				CustomerId
 --	-------		---------		---------------------		----------
 --	1			1				'01/01/2016 23:59:00'		1
 --	1			2				'01/01/2016 23:59:10'		1
@@ -9,23 +11,24 @@
 
 -- тогда запрос будет выглядеть таким образом:
 SELECT
-	s.[productid]
-	,COUNT(s.[productid]) AS [count]
+	s.[ProductId]
+	,COUNT(s.[ProductId]) AS [count],
+	s.[CustomerId]
 FROM [Sales] s
 JOIN (
-	SELECT
-		[salesid]
-		,MIN([datetime]) AS [minDate]
-	FROM [Sales]
-	GROUP BY [salesid]
+		SELECT
+			[Id]
+			,MIN([DateCreated]) AS [minDate]
+		FROM [Sales]
+		GROUP BY [Id]
 	) salesIdAndMinDate
-	ON salesIdAndMinDate.[salesid] = s.[salesid]
-	AND salesIdAndMinDate.[minDate] = s.[datetime]
-GROUP BY s.[productid]
+	ON salesIdAndMinDate.[Id] = s.[Id]
+	AND salesIdAndMinDate.[minDate] = s.[DateCreated]
+GROUP BY s.[ProductId], s.[CustomerId]
 
---	Если же заказ харектеризуется общим [datetime], а порядок элементов характеризуется полем [salesid]
+--	Если же заказ харектеризуется общим [DateCreated], а порядок элементов характеризуется полем [Id]
 -- 	как в примере:
---	salesid		productid		datetime 					customerid
+--	Id			ProductId		DateCreated 				CustomerId
 --	-------		---------		---------------------		----------
 --	1			1				'01/01/2016 23:59:00'		1
 --	2			2				'01/01/2016 23:59:00'		1
@@ -34,14 +37,15 @@ GROUP BY s.[productid]
 
 -- тогда запрос будет выглядеть таким образом:
 SELECT
-	s.[productid]
-	,COUNT(s.[productid]) AS [count]
+	s.[ProductId]
+	,COUNT(s.[ProductId]) AS [count]
+	,s.[CustomerId]
 FROM [Sales] s
 JOIN (
-	SELECT
-		MIN([salesid]) AS [minId]
-	FROM [Sales]
-	GROUP BY [datetime]
+		SELECT
+			MIN([Id]) AS [minId]
+		FROM [Sales]
+		GROUP BY [DateCreated], [CustomerId]
 	) minProdId
-	ON minProdId.[minId] = s.[salesid]
-GROUP BY s.[productid]
+	ON minProdId.[minId] = s.[Id]
+GROUP BY s.[ProductId], s.[CustomerId]
